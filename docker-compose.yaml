@@ -1,0 +1,48 @@
+version: '3'
+services:
+  postgresql1:
+    image: postgres:15
+    restart: always
+    container_name: database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    networks:
+      - grid
+    volumes:
+      - ./pgdata1:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "7070:80"
+    networks:
+      - grid
+    volumes:
+      - ./pgdata1:/var/lib/pgadmin  
+
+  influxdb:
+    build: ./influxdb
+    environment:
+      - INFLUXDB_ADMIN_USER=GYM
+      - INFLUXDB_ADMIN_PASSWORD=oral:cum:shot!
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+      - ./influxdb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "8086:8086"
+    networks:
+      - grid
+
+networks:
+  grid:
+
+volumes:
+  influxdb_data:
